@@ -1,5 +1,6 @@
-import unittest
 import argparse
+import os
+import unittest
 
 import mock
 
@@ -315,6 +316,196 @@ class TestTranslator(unittest.TestCase):
                 translator.process_arguments(args)
 
         self.assertEqual(exc.exception.code, 0)
+
+    def test_process_arguments_with_request(self):
+        request_data = """GET  HTTP/1.1\nHost: google.com\nCache-Control: no-cache"""
+        args = argparse.Namespace(
+                    interactive=False,
+                    language=["bash"],
+                    proxy=None,
+                    data=None,
+                    request=request_data,
+                    search_regex=None,
+                    search_string=None,
+                    file=None
+                )
+
+        self.assertEqual(type(translator.process_arguments(args)), type({}))
+
+    def test_process_arguments_with_file(self):
+        request_data = """GET  HTTP/1.1\nHost: google.com\nCache-Control: no-cache"""
+        with open('temp', 'w+') as f:
+            f.write(request_data)
+            f.close()
+
+        args = argparse.Namespace(
+                    interactive=False,
+                    language=["bash"],
+                    proxy=None,
+                    data=None,
+                    request=None,
+                    search_regex=None,
+                    search_string=None,
+                    file='temp'
+                )
+        self.assertEqual(type(translator.process_arguments(args)), type({}))
+        os.remove('temp')
+
+    def test_process_arguments_with_no_language(self):
+        request_data = """GET  HTTP/1.1\nHost: google.com\nCache-Control: no-cache"""
+        args = argparse.Namespace(
+                    interactive=False,
+                    language=None,
+                    proxy=None,
+                    data=None,
+                    request=request_data,
+                    search_regex=None,
+                    search_string=None,
+                    file=None
+                )
+
+        self.assertEqual(type(translator.process_arguments(args)), type({}))
+
+    def test_process_arguments_with_multiple_language(self):
+        request_data = """GET  HTTP/1.1\nHost: google.com\nCache-Control: no-cache"""
+        args = argparse.Namespace(
+                    interactive=False,
+                    language=["bash", "php", "python"],
+                    proxy=None,
+                    data=None,
+                    request=request_data,
+                    search_regex=None,
+                    search_string=None,
+                    file=None
+                )
+
+        self.assertEqual(type(translator.process_arguments(args)), type({}))
+
+    def test_process_arguments_with_wrong_language(self):
+        request_data = """GET  HTTP/1.1\nHost: google.com\nCache-Control: no-cache"""
+        args = argparse.Namespace(
+                    interactive=False,
+                    language=["lua"],
+                    proxy=None,
+                    data=None,
+                    request=request_data,
+                    search_regex=None,
+                    search_string=None,
+                    file=None
+                )
+
+        with self.assertRaises(ValueError):
+            translator.process_arguments(args)
+
+    def test_process_arguments_with_data(self):
+        request_data = """GET  HTTP/1.1\nHost: google.com\nCache-Control: no-cache"""
+        args = argparse.Namespace(
+                    interactive=False,
+                    language=["bash"],
+                    proxy=None,
+                    data="sample=1",
+                    request=request_data,
+                    search_regex=None,
+                    search_string=None,
+                    file=None
+                )
+
+        self.assertEqual(type(translator.process_arguments(args)), type({}))
+
+    def test_process_arguments_with_proxy_with_scheme(self):
+        request_data = """GET  HTTP/1.1\nHost: google.com\nCache-Control: no-cache"""
+        args = argparse.Namespace(
+                    interactive=False,
+                    language=["bash"],
+                    proxy="http://someproxy.com",
+                    data=None,
+                    request=request_data,
+                    search_regex=None,
+                    search_string=None,
+                    file=None
+                )
+
+        self.assertEqual(type(translator.process_arguments(args)), type({}))
+
+    def test_process_arguments_with_proxy_without_scheme_without_port(self):
+        request_data = """GET  HTTP/1.1\nHost: google.com\nCache-Control: no-cache"""
+        args = argparse.Namespace(
+                    interactive=False,
+                    language=["bash"],
+                    proxy="127.0.0.1",
+                    data=None,
+                    request=request_data,
+                    search_regex=None,
+                    search_string=None,
+                    file=None
+                )
+
+        self.assertEqual(type(translator.process_arguments(args)), type({}))
+
+    def test_process_arguments_with_proxy_without_scheme_with_port(self):
+        request_data = """GET  HTTP/1.1\nHost: google.com\nCache-Control: no-cache"""
+        args = argparse.Namespace(
+                    interactive=False,
+                    language=["bash"],
+                    proxy="127.0.0.1:1337",
+                    data=None,
+                    request=request_data,
+                    search_regex=None,
+                    search_string=None,
+                    file=None
+                )
+
+        self.assertEqual(type(translator.process_arguments(args)), type({}))
+
+    def test_process_arguments_with_invalid_proxy_without_scheme(self):
+        request_data = """GET  HTTP/1.1\nHost: google.com\nCache-Control: no-cache"""
+        args = argparse.Namespace(
+                    interactive=False,
+                    language=["bash"],
+                    proxy="127.0.0.",
+                    data=None,
+                    request=request_data,
+                    search_regex=None,
+                    search_string=None,
+                    file=None
+                )
+
+        with self.assertRaises(ValueError):
+            translator.process_arguments(args)
+
+    def test_process_arguments_with_invalid_proxy_with_scheme(self):
+        request_data = """GET  HTTP/1.1\nHost: google.com\nCache-Control: no-cache"""
+        args = argparse.Namespace(
+                    interactive=False,
+                    language=["bash"],
+                    proxy="http://127.0.0.",
+                    data=None,
+                    request=request_data,
+                    search_regex=None,
+                    search_string=None,
+                    file=None
+                )
+
+        with self.assertRaises(ValueError):
+            translator.process_arguments(args)
+
+    def test_process_arguments_with_no_data_and_method_post(self):
+        request_data = """POST  HTTP/1.1\nHost: google.com"""
+        args = argparse.Namespace(
+                    interactive=False,
+                    language=None,
+                    proxy=None,
+                    data=None,
+                    request=request_data,
+                    search_regex=None,
+                    search_string=None,
+                    file=None
+                )
+
+        with self.assertRaises(SystemExit) as exc:
+            translator.process_arguments(args)
+
+        self.assertEqual(exc.exception.code, -1)
 
 
 if __name__ == '__main__':
