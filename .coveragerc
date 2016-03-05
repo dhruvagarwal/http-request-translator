@@ -1,0 +1,7 @@
+[report]
+omit =
+    *argparse*
+    *mock*
+    *funcsigs*
+    *pbr*
+    *six*

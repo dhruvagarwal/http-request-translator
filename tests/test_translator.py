@@ -1,4 +1,7 @@
 import unittest
+import argparse
+
+import mock
 
 from http_request_translator import translator
 
@@ -276,6 +279,42 @@ class TestTranslator(unittest.TestCase):
                       "Host: foo.bar"
         with self.assertRaises(ValueError):
             translator.parse_raw_request(raw_request)
+
+    def test_process_arguments_with_no_arguments(self):
+        # Arguments
+        args = argparse.Namespace(
+                    interactive=False,
+                    language=None,
+                    proxy=None,
+                    data=None,
+                    request=None,
+                    search_regex=None,
+                    search_string=None,
+                    file=None
+                )
+
+        with self.assertRaises(SystemExit) as exc:
+            translator.process_arguments(args)
+
+        self.assertEqual(exc.exception.code, -1)
+
+    def test_process_arguments_with_interactive_mode(self):
+        args = argparse.Namespace(
+                    interactive=True,
+                    language="bash",
+                    proxy=None,
+                    data=None,
+                    request=None,
+                    search_regex=None,
+                    search_string=None,
+                    file=None
+                )
+
+        with self.assertRaises(SystemExit) as exc:
+            with mock.patch('http_request_translator.translator.take_headers', side_effect=KeyboardInterrupt):
+                translator.process_arguments(args)
+
+        self.assertEqual(exc.exception.code, 0)
 
 
 if __name__ == '__main__':
