@@ -40,7 +40,7 @@ def take_arguments():
         '--data', '-d',
         help='Add the data that you want to send along with the header.')
     parser.add_argument(
-        '--template', '-t',
+        '--custom-template', '-t',
         help='Add the path of the custom template you want to provide.')
     request_group.add_argument(
         '--request', '-r',
