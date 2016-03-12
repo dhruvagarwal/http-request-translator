@@ -27,16 +27,17 @@ class AbstractScript(object):
     code_search = ''
     code_nosearch = ''
 
-    def __init__(self, headers=None, details=None, search=None):
+    def __init__(self, headers=None, details=None, search=None, template=None):
         """Initialize the script generation.
 
         :param list headers: Headers list containing fields like 'Host', 'User-Agent', etc.
         :param dict details: Request specific details dictionary like body and method of the request.
         :param str search: String to search for in the response to the request.
+        :param str template: Custom template path in dotted module format.
 
         :raises ValueError: When url is invalid.
         """
-        self.load_attributes(self.__class__)
+        self.load_attributes(self.__class__, template)
         self._script = ''
         self.headers = headers
         self.details = details
@@ -190,21 +191,25 @@ class AbstractScript(object):
         return encoded_url
 
     @staticmethod
-    def load_attributes(cls):
+    def load_attributes(cls, template=None):
         """Loads attributes to Script class from a given script's template
 
         Imports the template file/module, assigns all the attributes defined in the template file to the given class.
 
         :param class cls: Script class to which template is to be loaded.
+        :param str template: Custom template path in dotted module format.
 
         :raises AttributeError: When __language__ attribute is not present.
         """
-        templates_path = "{}.templates".format(__name__.split('.', 1)[0])
-        if not hasattr(cls, '__language__'):
-            raise AttributeError("__language__ not found in class: {}, attributes cannot be loaded".format(cls.__name__))
-        template = import_module("{templates_path}.{class_template}".format(
-            templates_path=templates_path,
-            class_template=cls.__language__))
+        if template:
+            template = import_module(template)
+        else:
+            templates_path = "{}.templates".format(__name__.split('.', 1)[0])
+            if not hasattr(cls, '__language__'):
+                raise AttributeError("__language__ not found in class: {}, attributes cannot be loaded".format(cls.__name__))
+            template = import_module("{templates_path}.{class_template}".format(
+                templates_path=templates_path,
+                class_template=cls.__language__))
         attributes = (var for var in vars(template) if var.startswith('code_'))
         for attr in attributes:
             setattr(cls, attr, getattr(template, attr))

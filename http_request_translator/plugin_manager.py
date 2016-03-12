@@ -22,7 +22,7 @@ def get_script_class(script_name):
     raise ValueError("The {} language is not supported.".format(script_name))
 
 
-def generate_script(script, headers, details, search_string=None):
+def generate_script(script, headers, details, search_string=None, template=None):
     """Returns the script code for the HTTP request passed in script language
 
     :param str script: Name of the language for which script is to be generated
@@ -34,4 +34,4 @@ def generate_script(script, headers, details, search_string=None):
     :rtype: `str`
     """
     class_script = get_script_class(script.strip().lower())
-    return class_script(headers=headers, details=details, search=search_string).generate_script()
+    return class_script(headers=headers, details=details, search=search_string, template=template).generate_script()

@@ -72,7 +72,7 @@ def process_arguments(args):
         elif args.search_regex:
             arg_option = args.search_regex
         if len(script_list) == 0:
-            generated_code = generate_script('bash', headers, details, arg_option)
+            generated_code = generate_script('bash', headers, details, arg_option, args.template)
             print(generated_code)
         else:
             for script in script_list:
