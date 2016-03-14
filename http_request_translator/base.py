@@ -11,6 +11,7 @@ except ImportError:
 from importlib import import_module
 
 from .url import get_url, check_valid_url
+from .util import exists_global_custom_template, get_global_custom_template
 
 
 class AbstractScript(object):
@@ -203,6 +204,8 @@ class AbstractScript(object):
         """
         if template:
             template = import_module(template)
+        elif exists_global_custom_template(cls.__language__):
+            template = get_global_custom_template(cls.__language__)
         else:
             templates_path = "{}.templates".format(__name__.split('.', 1)[0])
             if not hasattr(cls, '__language__'):
