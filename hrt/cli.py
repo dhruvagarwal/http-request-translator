@@ -7,6 +7,12 @@ from .interface import HttpRequestTranslator
 from .input_handler import handlers
 
 
+try:
+    input = raw_input  # Python2/3 version
+except NameError:
+    pass
+
+
 def init():
     args = take_args()
     hrt = process_args(args)
@@ -124,6 +130,7 @@ def process_args(parser):
 
     input_type, options = get_input_type(args)
     if not input_type:
+        sys.stderr.write("error: Input a valid HTTP request or use interactive mode instead.\n\n")
         parser.print_help()
         sys.exit(-1)
 
