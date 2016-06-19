@@ -27,7 +27,7 @@ class InteractiveInput(Input):
 
     def take_input(self):
         raw_request = []
-        print "Enter raw request - "
+        print("Enter raw request - ")
         while True:
             try:
                 raw_request.append(input().strip())
