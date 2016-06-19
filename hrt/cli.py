@@ -7,12 +7,6 @@ from .interface import HttpRequestTranslator
 from .input_handler import handlers
 
 
-try:
-    input = raw_input  # Python2/3 version
-except NameError:
-    pass
-
-
 def init():
     args = take_args()
     hrt = process_args(args)

@@ -2,6 +2,12 @@ import os
 import sys
 
 
+try:
+    input = raw_input  # Python2/3 version
+except NameError:
+    pass
+
+
 class Input(object):
     def __init__(self, raw_request=""):
         self.raw_request = raw_request
@@ -24,7 +30,7 @@ class InteractiveInput(Input):
         print "Enter raw request - "
         while True:
             try:
-                raw_request.append(raw_input().strip())
+                raw_request.append(input().strip())
             except (EOFError, KeyboardInterrupt):
                 break
         self.raw_request = '\n'.join(raw_request).strip()
@@ -65,7 +71,7 @@ class StdinInput(Input):
     def take_input(self):
         while True:
             try:
-                self.raw_request += raw_input()+'\n'
+                self.raw_request += input()+'\n'
             except EOFError:
                 break
 
